@@ -72,7 +72,7 @@ def topological_ordering(digr_ori):
         """ Finds a sink node (node with all incoming arcs) 
         in the directed graph. Valid for a acyclic graph only """
         # first node is taken as a default
-        node = digr.keys()[0]
+        node = next(iter(digr.keys()))
         while digr[node]:
             node = digr[node][0]
         return node
@@ -174,43 +174,32 @@ def shortest_path(gr, fro, to):
 # print(shortest_path(g, 0, 3))
 
 def minimum_spanning_tree(gr):
-    """ Uses prim's algorithm to return the minimum 
-    cost spanning tree in a undirected connected graph.
-    Works only with undirected and connected graphs """
+    weight = 0 
+    heap = []
+    tree = []
 
-    def compute_key(gr, n, explored):
-        """ computes minimum key for node n from a set of explored
-        in graph gr. Used in Prim's implementation """
-        min_ = float('inf')
-        for v in gr[n]:
-            if v in explored:
-                w = gr[n][v]
-                min_ = min(w, min_)
-        return min_
+    start = next(iter(gr.keys()))
+    connected = set([start])
 
-    s = gr.keys()[0] 
-    explored = set([s])
-    unexplored = set(gr.keys())
-    unexplored.remove(s)
-    min_cost, node_heap = 0, []
+    for to, cost in gr[start].items():
+        heap.append((cost, start, to))
+    heapify(heap)
 
-    #computes the key for each vertex in unexplored
-    for n in unexplored:
-        min = compute_key(gr, n, explored)
-        heappush(node_heap, (min, n))
+    while heap:
+        cost, fro, to = heappop(heap)
+        if to in connected:
+            continue
+        connected.add(to)
+        tree.append((fro, to))
+        weight += cost
+        for n, cost in gr[to].items():
+            heappush(heap, (cost, to, n))
+    return weight, tree
 
-    while unexplored:
-        # adds the cheapest to "explored"
-        node_cost, min_node = heappop(node_heap)
-        min_cost += node_cost
-        explored.add(min_node)
-        unexplored.remove(min_node)
-
-        # recompute keys for neighbors of deleted node
-        for v in gr[min_node]:
-            if v in unexplored:
-                for i in range(len(node_heap)):
-                    if node_heap[i][1] == v:
-                        node_heap[i] = (compute_key(gr, v, explored), v)
-                        heapify(node_heap)
-    return min_cost
+# g = defaultdict(dict, {
+#     0: {1: 2, 2: 1},
+#     1: {3: 1, 0: 2},
+#     2: {3: 4, 0: 1},
+#     3: {2: 4, 1: 1},
+# })
+# print(minimum_spanning_tree(g))
