@@ -9,15 +9,15 @@ from heapq import *
 def BFS(gr, s):
     """ Breadth first search 
     Returns a list of nodes that are "findable" from s """
-    explored = set([s])
+    prev = {s:None}
     q = deque([s])
-    while len(q)!=0:
+    while q:
         node = q.popleft()
         for each in gr[node]:
-            if each not in explored:
-                explored.add(each)
+            if each not in prev:
+                prev[each] = node
                 q.append(each)
-    return explored
+    return prev
 
 def shortest_hops(gr, s):
     """ Finds the shortest number of hops required
@@ -26,7 +26,7 @@ def shortest_hops(gr, s):
     """
     dist = {}
     q = deque([s])
-    explored = set([s])
+    explored = {s}
     for n in gr.nodes():
         if n == s: dist[n] = 0
         else: dist[n] = float('inf')
@@ -46,7 +46,7 @@ def undirected_connected_components(gr):
     con_components = []
     for node in gr:
         if node not in explored:
-            reachable = BFS(gr, node)
+            reachable = BFS(gr, node).keys()
             con_components.append(reachable)
             explored |= reachable
     return con_components
@@ -59,7 +59,7 @@ def DFS(gr, s, path=None):
     if s in path: 
         return path
     path.add(s)
-    for each in gr[node]:
+    for each in gr[s]:
         if each not in path:
             DFS(gr, each, path)
     return path
@@ -179,7 +179,7 @@ def minimum_spanning_tree(gr):
     tree = []
 
     start = next(iter(gr.keys()))
-    connected = set([start])
+    connected = {start}
 
     for to, cost in gr[start].items():
         heap.append((cost, start, to))

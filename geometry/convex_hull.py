@@ -1,3 +1,5 @@
+from .basic import *
+
 def convex_hull(points):
     """Computes the convex hull of a set of 2D points.
     Input: an iterable sequence of (x, y) pairs representing the points.
@@ -31,15 +33,11 @@ def convex_hull(points):
     # Last point of each list is omitted because it is repeated at the beginning of the other list. 
     return lower[:-1] + upper[:-1]
 
-
-
-
 # 2D cross product of OA and OB vectors, i.e. z-component of their 3D cross product.
 # Returns a positive value, if OAB makes a counter-clockwise turn,
 # negative for clockwise turn, and zero if the points are collinear.
 def cross(o, a, b):
     return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
-
 
 # Example: convex hull of a 10-by-10 grid.
 print(convex_hull([(i//10, i%10) for i in range(100)]) == [(0, 0), (9, 0), (9, 9), (0, 9)])
